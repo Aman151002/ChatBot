@@ -1,0 +1,87 @@
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn import svm
+from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import StandardScaler
+depression_data = pd.read_csv('/content/Depression.csv')
+X = depression_data.drop(columns=['number','edu','madrs1','madrs2','days','madrsav', 'status'], axis=1)
+Y = depression_data['status']
+X
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=2)
+scaler = StandardScaler()
+scaler.fit(X_train)
+model = svm.SVC(kernel='linear')
+model.fit(X_train, Y_train)
+X_train_prediction = model.predict(X_train)
+training_data_accuracy = accuracy_score(Y_train, X_train_prediction)
+print('Accuracy score of training data : ', training_data_accuracy)
+X_test_prediction = model.predict(X_test)
+test_data_accuracy = accuracy_score(Y_test, X_test_prediction)
+print('Accuracy score of test data : ', test_data_accuracy)
+input_data = (2,	37,	2,	2,	2,		1,	2)
+# changing input data to a numpy array
+input_data_as_numpy_array = np.asarray(input_data)
+
+# reshape the numpy array
+input_data_reshaped = input_data_as_numpy_array.reshape(1,-1)
+
+prediction = model.predict(input_data_reshaped)
+print(prediction)
+
+
+if (prediction[0] == 1):
+  print("The Person have mild depression symptoms")
+
+elif (prediction[0] == 2):
+  print("This person has moderate symptoms")
+
+else:
+  print("The Person has no symptoms")
+  import pickle
+!pip install streamlit
+import streamlit as st
+filename = 'depression_model.sav'
+pickle.dump(model, open(filename, 'wb'))
+loaded_model = pickle.load(open('depression_model.sav', 'rb'))
+from pandas.io.parsers.readers import deprecate_kwarg
+st.title("Epilepsy Prediction using ML")
+    
+col1, col2, col3, col4, col5 = st.columns(5)  
+    
+with col1:
+       gender = st.text_input('gender')
+        
+with col2:
+       age = st.text_input('age')
+        
+with col3:
+       afftype = st.text_input('afftype')
+        
+with col4:
+        melanch = st.text_input('melanch')
+        
+with col5:
+       inpatient = st.text_input('inpatient')
+        
+with col1:
+        marriage = st.text_input('marriage')
+        
+with col2:
+        work = st.text_input('work')
+    
+
+    # code for Prediction
+depression_diagnosis = ''
+    
+    # creating a button for Prediction    
+if st.button("depression Result"):
+       depression_prediction = depression_model.predict([[gender, age, afftype, melanch, inpatient, marriage, work]])
+       if (depression_prediction[0] == 1):
+          depression_diagnosis = "The person has mild symptoms"
+       elif (depression_prediction[0] == 2):
+         depression_diagnosis = "The person has moderate symptoms"
+       else:
+         depression_diagnosis = "The person has no symptoms"
+        
+st.success(depression_diagnosis)
